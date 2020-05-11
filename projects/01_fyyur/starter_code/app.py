@@ -312,15 +312,26 @@ def search_artists():
   # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
   # seach for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
   # search for "band" should return "The Wild Sax Band".
-  response={
-    "count": 1,
-    "data": [{
-      "id": 4,
-      "name": "Guns N Petals",
-      "num_upcoming_shows": 0,
-    }]
-  }
-  return render_template('pages/search_artists.html', results=response, search_term=request.form.get('search_term', ''))
+  #search_term
+  #this was extremely difficult. seems to work.
+  #need to solve for num_upcoming_shows. i dont think adding this as a row is right? why would i do that?
+  #should probably query it after the for loop and add it...putting placeholder for now
+  search = request.form.get('search_term').lower()
+  count = db.session.query(Artist).filter(Artist.name.ilike('%' + search + '%')).count()
+  response = {'count': count, 'data': []}
+  #response['data'] = 
+  for row in db.session.query(Artist).filter(Artist.name.ilike('%' + search + '%')).all():
+      response['data'].append(row)
+  #num_upcoming_shows = db.session.query(Shows).filter(Artist.id)....is...the row.id   
+  return render_template('pages/search_artists.html', results=response, search_term=search)
+  #response={
+  #  "count": 1,
+  #  "data": [{
+  #    "id": 4,
+  #    "name": "Guns N Petals",
+  #    "num_upcoming_shows": 0,
+  #  }]
+  #}
 
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
